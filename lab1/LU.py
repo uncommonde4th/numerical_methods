@@ -3,45 +3,68 @@ import numpy as np
 
 def lu_decompose(A):
     n = A.shape[0]
-    U = A.astype(float).copy()
+    U = A.copy()
     L = np.eye(n)
-    perm = list(range(n))
+    P = np.eye(n)
     swaps = 0
-    tol = 1e-12 * max(1.0, np.max(np.abs(A)))
 
     for k in range(n - 1):
-        m = k + int(np.argmax(np.abs(U[k:, k])))
-        if abs(U[m, k]) < tol:
+        # Выбираем главный элемент.
+        m = k
+        for i in range(k + 1, n):
+            if abs(U[i, k]) > abs(U[m, k]):
+                m = i
+        if abs(U[m, k]) < 1e-12:
             raise ValueError("Матрица вырождена")
+
+        # Перестановка строк k и m.
         if m != k:
-            U[[k, m], :] = U[[m, k], :]
-            L[[k, m], :k] = L[[m, k], :k]
-            perm[k], perm[m] = perm[m], perm[k]
+            tmp = U[k].copy()
+            U[k] = U[m]
+            U[m] = tmp
+
+            tmp = P[k].copy()
+            P[k] = P[m]
+            P[m] = tmp
+
+            for j in range(k):
+                tmp = L[k, j]
+                L[k, j] = L[m, j]
+                L[m, j] = tmp
             swaps += 1
 
+        # Обнуление поддиагональных элементов k-го столбца.
         for i in range(k + 1, n):
-            mu = U[i, k] / U[k, k]
+            mu = U[i, k] / U[k,k]
             L[i, k] = mu
-            U[i, k:] = U[i, k:] - mu * U[k, k:]
-            U[i, k] = 0.0
-    if abs(U[n - 1, n - 1]) < tol:
-        raise ValueError("Матрица вырождена: U_nn = 0")
-
-    P = np.zeros((n, n))
-    for i in range(n):
-        P[i, perm[i]] = 1.0
+            for j in range(k, n):
+                U[i, j] = U[i, j] - mu * U[k, j]
+        
+    if abs(U[n - 1, n - 1]) < 1e-12:
+        raise ValueError("Матрица вырождена")
+    
     return L, U, P, swaps
 
 
 def solve_lu(L, U, P, b):
     n = L.shape[0]
     Pb = P @ b
+
+    # Lz = Pb
     z = np.zeros(n)
     for i in range(n):
-        z[i] = Pb[i] - np.dot(L[i, :i], z[:i])
+        s = 0.0
+        for j in range(i):
+            s += L[i, j] * z[j]
+        z[i] = Pb[i] - s
+    
+    # Ux = z
     x = np.zeros(n)
     for i in range(n - 1, -1, -1):
-        x[i] = (z[i] - np.dot(U[i, i + 1 :], x[i + 1 :])) / U[i, i]
+        s = 0.0
+        for j in range(i + 1, n):
+            s += U[i, j] * x[j]
+        x[i] = (z[i] - s) / U[i, i]
     return x
 
 
