@@ -30,19 +30,20 @@ def progonka(a, b, c, d):
 
 
 def main():
+    a, b, c, d = [], [], [], []
     with open("matrix1.2.txt") as f:
-        data = [[float(t) for t in line.split()] for line in f if line.strip()]
-    M = np.array(data, dtype=float)
-    n = M.shape[0]
-    a, b, c, d = np.zeros(n), np.zeros(n), np.zeros(n), M[:, -1]
+        for line in f:
+            if not line.strip():
+                continue
+            row = [float(t) for t in line.split()]
+            i = len(b)
+            a.append(row[i - 1] if i > 0 else 0.0)
+            b.append(row[i])
+            c.append(row[i + 1] if i < len(row) - 2 else 0.0)
+            d.append(row[-1])
+    a, b, c, d = np.array(a), np.array(b), np.array(c), np.array(d)
 
-    for i in range(n):
-        b[i] = M[i, i]
-        if i > 0:
-            a[i] = M[i, i - 1]
-        if i < n - 1:
-            c[i] = M[i, i + 1]
-
+    n = len(b)
     digits = 3
 
     P, Q, x = progonka(a, b, c, d)
@@ -54,8 +55,6 @@ def main():
 
     print("Решение системы:")
     print(np.round(x.reshape(n, 1), digits), "\n")
-
-
 
 
 if __name__ == "__main__":

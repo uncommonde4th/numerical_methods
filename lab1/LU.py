@@ -39,6 +39,7 @@ def lu_decompose(A):
             L[i, k] = mu
             for j in range(k, n):
                 U[i, j] = U[i, j] - mu * U[k, j]
+            U[i, k] = 0.0
         
     if abs(U[n - 1, n - 1]) < 1e-12:
         raise ValueError("Матрица вырождена")

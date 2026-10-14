@@ -29,14 +29,14 @@ def rotation_matrix(n, i, j, phi):
     return U
 
 
-def jacobi(A, eps, max_iter=100000):
+def jacobi(A, epsilon, max_iter=100000):
     n = A.shape[0]
     Ak = A.copy()
     V = np.eye(n)
     
     iterations = 0
 
-    while off_diagonal_norm(Ak) >= eps:
+    while off_diagonal_norm(Ak) >= epsilon:
         max_value = 0.0
         p = 0
         q = 1
@@ -68,15 +68,15 @@ def main():
     with open("matrix1.4.txt") as f:
         data = [[float(t) for t in line.split()] for line in f if line.strip()]
 
-    eps = 0.01
+    epsilon = 0.01
     A = np.array(data, dtype=float)
 
     n = A.shape[0]
 
     print("Точность эпсилон:")
-    print(eps)
+    print(epsilon)
 
-    values, V, Ak, iterations = jacobi(A, eps)
+    values, V, Ak, iterations = jacobi(A, epsilon)
 
     print("Собственные значения:")
     print(np.round(values, 2))
