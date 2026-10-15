@@ -14,12 +14,10 @@ def progonka(a, b, c, d):
     P[0] = -c[0] / b[0]
     Q[0] = d[0] / b[0]
     for i in range(1, n - 1):
-        den = b[i] + a[i] * P[i - 1]
-        P[i] = -c[i] / den
-        Q[i] = (d[i] - a[i] * Q[i - 1]) / den
-    den = b[n - 1] + a[n - 1] * P[n - 2]
+        P[i] = -c[i] / (b[i] + a[i] * P[i - 1])
+        Q[i] = (d[i] - a[i] * Q[i - 1]) / (b[i] + a[i] * P[i - 1])
     P[n - 1] = 0.0
-    Q[n - 1] = (d[n - 1] - a[n - 1] * Q[n - 2]) / den
+    Q[n - 1] = (d[n - 1] - a[n - 1] * Q[n - 2]) / (b[n - 1] + a[n - 1] * P[n - 2])
 
     # Обратный ход.
     x = np.zeros(n)
