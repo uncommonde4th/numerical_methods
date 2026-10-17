@@ -8,7 +8,7 @@ def off_diagonal_norm(A):
     for i in range(n):
         for j in range(i + 1, n):
             s += A[i, j] ** 2
-    
+
     return np.sqrt(s)
 
 
@@ -29,11 +29,11 @@ def rotation_matrix(n, i, j, phi):
     return U
 
 
-def jacobi(A, epsilon, max_iter=100000):
+def jacobi(A, epsilon):
     n = A.shape[0]
     Ak = A.copy()
     V = np.eye(n)
-    
+
     iterations = 0
 
     while off_diagonal_norm(Ak) >= epsilon:

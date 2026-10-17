@@ -45,12 +45,12 @@ def max_diff(x_new, x_old):
     return result
 
 
-def simple_iterations(alpha, beta, epsilon, maxiter=10000):
+def simple_iterations(alpha, beta, epsilon):
     alpha_norm = matrix_norm(alpha)
     x = beta.copy()
     err = epsilon + 1
     count = 0
-    while err > epsilon and err < 1e10 and count < maxiter:
+    while err > epsilon:
         x_new = alpha @ x + beta
         diff = max_diff(x_new, x)
         if alpha_norm < 1:
@@ -62,14 +62,14 @@ def simple_iterations(alpha, beta, epsilon, maxiter=10000):
     return x, count, err
 
 
-def seidel(alpha, beta, epsilon, maxiter=10000):
+def seidel(alpha, beta, epsilon):
     n = alpha.shape[0]
     alpha_norm = matrix_norm(alpha)
     c_norm = upper_norm(alpha)
     x = beta.copy()
     err = epsilon + 1
     count = 0
-    while err > epsilon and err < 1e10 and count < maxiter:
+    while err > epsilon:
         x_new = x.copy()
         for i in range(n):
             s = beta[i]

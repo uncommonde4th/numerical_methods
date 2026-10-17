@@ -11,7 +11,7 @@ def column_norm(a, j, start):
     s = 0.0
     for l in range(start, a.shape[0]):
         s += a[l, j] ** 2
-    return s ** 0.5
+    return s**0.5
 
 
 def QR(a, n):
@@ -38,7 +38,7 @@ def block_eigenvalues(a, j):
     q = a[j, j] * a[j + 1, j + 1] - a[j, j + 1] * a[j + 1, j]
     D = p * p - 4 * q
     if D >= 0:
-        s = D ** 0.5
+        s = D**0.5
         return (p + s) / 2, (p - s) / 2
     s = (-D) ** 0.5
     return complex(p / 2, s / 2), complex(p / 2, -s / 2)
@@ -77,14 +77,14 @@ def get_eigenvalues(a, epsilon, prev):
     return eig, blocks, d
 
 
-def qr_algorithm(a0, epsilon, maxiter):
+def qr_algorithm(a0, epsilon):
     n = a0.shape[0]
     a = a0.copy()
     eig = [0] * n
     blocks = [None] * n
     d = 1e9
     k = 0
-    while d > epsilon and k < maxiter:
+    while d > epsilon:
         k += 1
         q, r = QR(a, n)
         a = r @ q
@@ -103,7 +103,7 @@ def main():
     digits = 3
 
     q0, r0 = QR(a0, n)
-    a, eig, d, k = qr_algorithm(a0, epsilon, maxiter)
+    a, eig, d, k = qr_algorithm(a0, epsilon)
 
     print("Заданная точность epsilon:")
     print(epsilon, "\n")
@@ -119,8 +119,6 @@ def main():
 
     print("Количество итераций:")
     print(k, "\n")
-    if d > epsilon:
-        print("Точность за", maxiter, "итераций не достигнута\n")
 
     print("Матрица A после итераций:")
     print(np.round(a, digits), "\n")
