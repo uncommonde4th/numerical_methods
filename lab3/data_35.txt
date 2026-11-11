@@ -1,0 +1,2 @@
+# a b h1 h2 output_precision
+-1.0 1.0 0.5 0.25 12
