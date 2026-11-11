@@ -53,6 +53,36 @@ def newton_coefficients(x, table):
     return result
 
 
+def print_divided_differences(x, table, precision):
+    """Таблица разделённых разностей: строка i - узел x[i] и разности f(x[i], ..., x[i+k])"""
+    n = len(x)
+    width = precision + 6
+    print("\nТаблица разделённых разностей:")
+    line = f"{'i':<3}{'x[i]':>{width}}"
+    for k in range(n):
+        line += f"{'порядок ' + str(k):>{width}}"
+    print(line)
+    for i in range(n):
+        line = f"{i:<3}{x[i]:>{width}.{precision}f}"
+        for k in range(n - i):
+            line += f"{table[i, k]:>{width}.{precision}f}"
+        print(line)
+
+
+def print_newton_form(x, table, precision):
+    """Многочлен Ньютона через разделённые разности: P(x) = f0 + f01*(x-x0) + ..."""
+    result = f"P(x) = {table[0, 0]:.{precision}f}"
+    factors = ""
+    for i in range(1, len(x)):
+        if x[i - 1] >= 0:
+            factors += f"(x - {x[i - 1]:.{precision}f})"
+        else:
+            factors += f"(x + {-x[i - 1]:.{precision}f})"
+        sign = "-" if table[0, i] < 0 else "+"
+        result += f" {sign} {abs(table[0, i]):.{precision}f}*{factors}"
+    print(result)
+
+
 def main():
     data = read_numbers("data_31.txt")
     x_star = data[0] / data[1] * np.pi
@@ -80,25 +110,35 @@ def main():
         exact = f(x_star)
 
         print(f"\nСлучай {case_name}")
+        print("Узлы интерполяции:")
         for i in range(len(x)):
             print(f"x[{i}] = {x[i]:.{precision}f}, y[{i}] = {y[i]:.{precision}f}")
+
         print("\nМногочлен Лагранжа:")
         print_polynomial(l_coef, "L", precision)
-        print("Многочлен Ньютона:")
+
+        print_divided_differences(x, table, precision)
+
+        print("\nМногочлен Ньютона (через разделённые разности):")
+        print_newton_form(x, table, precision)
+        print("Многочлен Ньютона (в виде суммы степеней x):")
         print_polynomial(n_coef, "P", precision)
-        print(f"L(x*) = {l_value:.{precision}f}")
+
+        print(f"\nL(x*) = {l_value:.{precision}f}")
         print(f"P(x*) = {n_value:.{precision}f}")
         print(f"f(x*) = {exact:.{precision}f}")
-        print(f"Погрешность Лагранжа = {abs(exact-l_value):.{precision}f}")
-        print(f"Погрешность Ньютона = {abs(exact-n_value):.{precision}f}")
+        print(f"Абсолютная погрешность Лагранжа = {abs(exact - l_value):.{precision}f}")
+        print(f"Абсолютная погрешность Ньютона = {abs(exact - n_value):.{precision}f}")
+        print(f"|L(x*) - P(x*)| = {abs(l_value - n_value):.{precision}e}")
 
         xx = np.linspace(x[0], x[-1], 400)
         plt.figure(figsize=(8, 5))
         plt.plot(xx, f(xx), label="f(x) = tg(x)")
         plt.plot(xx, np.polyval(l_coef[::-1], xx), "--", label="Лагранж")
-        plt.plot(xx, np.polyval(n_coef[::-1], xx), ":", label="Ньютон")
+        plt.plot(xx, np.polyval(n_coef[::-1], xx), ":", linewidth=2, label="Ньютон")
         plt.scatter(x, y, color="black", label="Узлы")
-        plt.scatter(x_star, l_value, color="red", label="x*")
+        plt.axvline(x_star, color="red", linestyle="--", linewidth=0.8)
+        plt.scatter(x_star, l_value, color="red", zorder=5, label="x*")
         plt.title(f"Интерполяция, случай {case_name}")
         plt.xlabel("x")
         plt.ylabel("y")
