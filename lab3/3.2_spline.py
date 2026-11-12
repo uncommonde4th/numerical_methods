@@ -59,7 +59,9 @@ def main():
         print(f"x[{i}] = {x[i]:.{precision}f}, y[{i}] = {y[i]:.{precision}f}")
 
     print("\nКоэффициенты сплайна")
-    print("S_i(x) = a_i + b_i*(x - x_(i-1)) + c_i*(x - x_(i-1))^2 + d_i*(x - x_(i-1))^3,")
+    print(
+        "S_i(x) = a_i + b_i*(x - x_(i-1)) + c_i*(x - x_(i-1))^2 + d_i*(x - x_(i-1))^3,"
+    )
     print("x_(i-1) <= x <= x_i")
     width = precision + 6
     print(
@@ -77,7 +79,9 @@ def main():
     interval = find_interval(x, x_star)
     value = piece_value(x, a, b, c, d, interval, x_star)
     print(f"\nx* = {x_star:.{precision}f}")
-    print(f"Номер интервала, содержащего x*: {interval + 1} ([{x[interval]:g}, {x[interval + 1]:g}])")
+    print(
+        f"Номер интервала, содержащего x*: {interval + 1} ([{x[interval]:g}, {x[interval + 1]:g}])"
+    )
     print(f"S(x*) = {value:.{precision}f}")
 
     print("\nПроверка прохождения сплайна через узлы:")
@@ -89,15 +93,18 @@ def main():
             s = piece_value(x, a, b, c, d, k - 1, x[k])
         error = abs(s - y[k])
         max_error = max(max_error, error)
-        print(f"x[{k}] = {x[k]:.{precision}f}: S(x[{k}]) = {s:.{precision}f}, y[{k}] = {y[k]:.{precision}f}, |S - y| = {error:.3e}")
+        print(
+            f"x[{k}] = {x[k]:.{precision}f}: S(x[{k}]) = {s:.{precision}f}, y[{k}] = {y[k]:.{precision}f}, |S - y| = {error:.3e}"
+        )
     if max_error < 1e-9:
         print("Сплайн проходит через все узлы")
     else:
         print("Сплайн НЕ проходит через все узлы")
 
+    last_step = x[-1] - x[-2]
     print("\nПроверка граничных условий (вторая производная на концах):")
     print(f"S''(x0) = {2 * c[0]:.{precision}f}")
-    print(f"S''(xn) = {2 * c[-1]:.{precision}f}")
+    print(f"S''(xn) = {2 * c[-2] + 6 * d[-1] * last_step:.{precision}f}")
 
     plt.figure(figsize=(8, 5))
     for i in range(len(a)):
@@ -105,7 +112,13 @@ def main():
         yy = piece_value(x, a, b, c, d, i, xx)
         plt.plot(xx, yy, label=f"Участок {i + 1}")
     plt.scatter(x, y, color="black", label="Узлы")
-    plt.scatter(x_star, value, color="red", zorder=5, label=f"(x*, S(x*)) = ({x_star:g}, {value:.4f})")
+    plt.scatter(
+        x_star,
+        value,
+        color="red",
+        zorder=5,
+        label=f"(x*, S(x*)) = ({x_star:g}, {value:.4f})",
+    )
     plt.title("Кубический сплайн")
     plt.xlabel("x")
     plt.ylabel("S(x)")
